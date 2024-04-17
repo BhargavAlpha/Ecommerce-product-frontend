@@ -1,0 +1,18 @@
+.container {
+  padding: 1rem;
+}
+.submissionsTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.submissionsTable th,
+.submissionsTable td {
+  /* border: 1px solid #ddd; */
+  padding: 8px;
+  text-align: left;
+}
+
+.submissionsTable th{
+  background-color: #f2f2f2;
+}
