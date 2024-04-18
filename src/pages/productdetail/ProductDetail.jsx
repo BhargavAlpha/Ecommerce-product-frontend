@@ -3,12 +3,14 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './ProductDetail.module.css';
 import Navbar from '../../components/navbar/Navbar';
+import { set } from 'mongoose';
 
 const ProductDetail = () => {
-  const url=import.meta.env.VITE_BACKEND_URL
+  const url = import.meta.env.VITE_BACKEND_URL;
   const { id } = useParams();
-    console.log("id",id);
   const email = localStorage.getItem('email');
+  const isAdmin = localStorage.getItem('role') === 'admin';
+  const [file,setFile]=useState(null)
   const [product, setProduct] = useState(null);
   const [formData, setFormData] = useState({
     productId: parseInt(id),
@@ -24,13 +26,12 @@ const ProductDetail = () => {
       try {
         const response = await axios.get(`${url}/product/${id}`);
         const fetchedProduct = response.data;
-
         setProduct(fetchedProduct);
         setFormData({
           productName: fetchedProduct.productName,
           price: fetchedProduct.price,
           productDescription: fetchedProduct.productDescription,
-          image: null, 
+          image: fetchedProduct.image,
           email: email
         });
       } catch (error) {
@@ -45,40 +46,49 @@ const ProductDetail = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setFormData({ ...formData, image: file });
-  };
+  const handleImageChange=(e)=>{
+    setFile(e.target.files[0]);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(file){
+      const data=new FormData()
+      const filename=Date.now()+file.name
+      data.append("img",filename)
+      data.append("file",file)
+      try{
+        console.log(`${url}/upload`);
+        const imgUpload=await axios.post(`${url}/upload`,data);
+        console.log(imgUpload.data)
+      }
+      catch(err){
+        console.log(err)
+      }
+      formData.image=`${url}/images/${filename}`;
+    }
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('productName', formData.productName);
-      formDataToSend.append('price', formData.price);
-      formDataToSend.append('productDescription', formData.productDescription);
-      formDataToSend.append('image', formData.image);
-      formDataToSend.append('productId', parseInt(id) );
-
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0] + ', ' + pair[1]);
+      const formDataToSend={
+        ...formData
       }
-
-      const response = await axios.post(`${url}/api/submit-request`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-    
-      console.log('Product updated:', response.data);
-      alert('Product updated successfully!');
+      if (isAdmin) {
+        console.log(`${url}/product/${id}`);
+        console.log(formDataToSend);
+        console.log(formData);
+        const response = await axios.put(`${url}/product/${id}`, formDataToSend);
+        console.log('Product updated:', response.data);
+        alert('Product updated successfully!');
+      } else {
+        const response = await axios.post(`${url}/api/submit-request`, formDataToSend);
+        console.log('Request submitted:', response.data);
+        const increaseRequestCount = await axios.put(`${url}/user/count/${email}`);
+        console.log('Request count updated:', increaseRequestCount.data);
+        alert('Request submitted successfully!');
+      }
     } catch (error) {
-      console.error('Error updating product:', error);
-      alert('Failed to update product');
+      console.error('Error updating product/request:', error);
+      alert('Failed to update product/request');
     }
   };
 
@@ -122,9 +132,18 @@ const ProductDetail = () => {
             name="image"
             onChange={handleImageChange}
           />
-          <button className={styles.btn} type="submit">
-            Submit for Review
-          </button>
+          {
+            isAdmin ?
+              <button className={styles.btn} type="button" onClick={handleSubmit}>
+                Make Change
+              </button>
+              :
+              <button className={styles.btn} type="button" onClick={handleSubmit}>
+                Submit for Review
+              </button>
+            
+          }
+
         </form>
       </div>
     </div>

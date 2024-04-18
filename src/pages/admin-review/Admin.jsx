@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Admin.module.css';
 import Navbar from '../../components/navbar/Navbar';
+import {toast, ToastContainer} from 'react-toastify';
 
 const ProductAdminDetail = () => {
   const url=import.meta.env.VITE_BACKEND_URL
@@ -36,9 +37,10 @@ const ProductAdminDetail = () => {
     try {
       await axios.put(`${url}/reviews/${id}`, { status: 'approved' });
       const updatedFields = getUpdatedFields();
-      if (Object.keys(updatedFields).length > 0) {
+      if (Object.keys(updatedFields).length > 0){
         const response = await axios.put(`${url}/product/${originalProduct._id}`, updatedFields);
         console.log('Approve response:', response.data);
+        toast.success('Product approved successfully');
       } else {
         console.log('No changes to update.');
       }
@@ -121,6 +123,7 @@ const ProductAdminDetail = () => {
         <button className={styles.approveBtn} onClick={handleApprove}>Approve</button>
         <button className={styles.rejectBtn} onClick={handleReject}>Reject</button>
       </div>
+      <ToastContainer />
     </div>
   );
 };
