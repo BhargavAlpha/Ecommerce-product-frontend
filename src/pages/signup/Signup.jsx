@@ -44,18 +44,18 @@ const Signup = () => {
       
       if (response.data.name) {
         navigate('/login');
-        showToastSuccessMessage();
       } else if (response.data.error) {
         if (response.data.error.includes('User already exists')) {
-          showToastFailureMessage('User already exists!');
+          console.log('User already exists');
         } else {
-          showToastFailureMessage(response.data.error);
+          console.log('Error registering user:', response.data.error);
         }
       } else {
-        showToastFailureMessage('An error occurred. Please try again later.');
+        // showToast('Something went wrong. Please try again.', 'error');
+        console.log('Something went wrong. Please try again.');
       }
     } catch (error) {
-      showToastFailureMessage(error.message);
+      console.error('Error registering user:', error);
     }
   };
   
