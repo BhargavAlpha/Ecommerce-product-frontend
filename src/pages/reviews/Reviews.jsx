@@ -45,7 +45,6 @@ function Reviews() {
                     {review.productName}
                   </td>
                   <td>{review.productId}</td>
-                  {/* Add the date field from the review object */}
                   <td>{review.status}</td>
                 </tr>
               ))}

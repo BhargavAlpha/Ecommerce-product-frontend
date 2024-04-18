@@ -35,12 +35,20 @@ const ProductAdminDetail = () => {
 
   const handleApprove = async () => {
     try {
-      await axios.put(`${url}/reviews/${id}`, { status: 'approved' });
       const updatedFields = getUpdatedFields();
       if (Object.keys(updatedFields).length > 0){
-        const response = await axios.put(`${url}/product/${originalProduct._id}`, updatedFields);
+        const productId = submissionData.productId;
+        const response = await axios.put(`${url}/product/${productId}`, updatedFields);
         console.log('Approve response:', response.data);
-        toast.success('Product approved successfully');
+        alert('Product approved successfully');
+        await axios.put(`${url}/reviews/${id}`, { status: 'approved' });
+        const memberEmail=submissionData.email;
+        const adminEmail=localStorage.getItem('email'); 
+        const increaseRequestCount = await axios.put(`${url}/user/count/${adminEmail}`);
+        const reviewApproved=await axios.put(`${url}/user/approve/${memberEmail}`);
+        const reviewApprovedAdmin=await axios.put(`${url}/user/approve/${adminEmail}`);
+        console.log('Review approved:', reviewApproved.data);
+        console.log('Review approved:', reviewApprovedAdmin.data);
       } else {
         console.log('No changes to update.');
       }
@@ -52,6 +60,12 @@ const ProductAdminDetail = () => {
   const handleReject = async () => {
     try {
       await axios.put(`${url}/reviews/${id}`, { status: 'rejected' });
+      alert('Product rejected successfully');
+      const memberEmail=submissionData.email;
+      const adminEmail=localStorage.getItem('email');
+      const increaseRequestCount = await axios.put(`${url}/user/count/${adminEmail}`);
+      const reviewRejected=await axios.put(`${url}/user/reject/${memberEmail}`);
+      const reviewRejectedAdmin=await axios.put(`${url}/user/reject/${adminEmail}`);
     } catch (error) {
       console.error('Error rejecting product:', error);
     }

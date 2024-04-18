@@ -26,7 +26,9 @@ const ProductDetail = () => {
         const response = await axios.get(`${url}/product/${id}`);
         const fetchedProduct = response.data;
         setProduct(fetchedProduct);
+        console.log(fetchedProduct);
         setFormData({
+          productId: fetchedProduct.id,
           productName: fetchedProduct.productName,
           price: fetchedProduct.price,
           productDescription: fetchedProduct.productDescription,

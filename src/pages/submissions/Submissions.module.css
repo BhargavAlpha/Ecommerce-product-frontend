@@ -12,7 +12,10 @@
   padding: 8px;
   text-align: left;
 }
-
+.submissionsTable tr{
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
 .submissionsTable th{
   background-color: #f2f2f2;
 }
