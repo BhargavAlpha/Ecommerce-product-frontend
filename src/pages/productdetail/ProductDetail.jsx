@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './ProductDetail.module.css';
 import Navbar from '../../components/navbar/Navbar';
-import { set } from 'mongoose';
 
 const ProductDetail = () => {
   const url = import.meta.env.VITE_BACKEND_URL;
